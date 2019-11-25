@@ -16,7 +16,7 @@ file.onchange = function () {
     canvas = document.getElementById("canvas");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    ctx = canvas.getContext("2d");
+    ctx = canvas.getContext("2d", { alpha: false });
 
     src.connect(analyser);
     analyser.connect(context.destination);
@@ -36,7 +36,7 @@ file.onchange = function () {
     function renderFrame() {
         requestAnimationFrame(renderFrame);
 
-        x = 0;
+        let x = 0, i = 0;
 
         analyser.getByteFrequencyData(dataArray);
 
@@ -50,10 +50,10 @@ file.onchange = function () {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-        for (var i = 0; i < bufferLength; i++) {
-            barHeight = HEIGHT * dataArray[i] / 256;
+        dataArray.forEach( (element) => {
+            barHeight = Math.floor(HEIGHT * element / 256);
 
-            var r = barHeight + (25 * (i / bufferLength));
+            var r = element + (25 * (i / bufferLength));
             var g = 250 * (i / bufferLength);
             var b = 50;
 
@@ -61,7 +61,8 @@ file.onchange = function () {
             ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
             x += barWidth + 1;
-        }
+            i += 1;
+        });
     }
     renderFrame();
 };
